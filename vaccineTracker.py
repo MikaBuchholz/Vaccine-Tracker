@@ -33,15 +33,19 @@ class CheckAvailability():
     def getPageContent(self) -> List[Union[str, int]]:
         pageContentList: List[Union[str, int]] = []
 
-        for key in self.pageInfoDict.keys():
-            fullUrl: str = f'{self.rootUrl}{key}'
+        try:
+            for key in self.pageInfoDict.keys():
+                fullUrl: str = f'{self.rootUrl}{key}'
 
-            page: object = requests.get(fullUrl, headers=self.headers)
-            soup: object = BeautifulSoup(page.content, features='lxml')
+                page: object = requests.get(fullUrl, headers=self.headers)
+                soup: object = BeautifulSoup(page.content, features='lxml')
 
-            pageText: str = soup.get_text()
+                pageText: str = soup.get_text()
 
-            pageContentList.append([pageText, key])
+                pageContentList.append([pageText, key])
+
+        except:
+            self.main()
 
         return pageContentList
 
