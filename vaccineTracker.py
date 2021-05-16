@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 from twilio.rest import Client
 from os import environ
 from dotenv import load_dotenv, dotenv_values
+import webbrowser
 
 load_dotenv()
 
@@ -49,19 +50,25 @@ class CheckAvailability():
 
         return pageContentList
 
-    def main(self) -> bool:
+    def main(self, sendSMS: bool) -> bool:
         while self.keepChecking:
             pageContent: List[Union[str, int]] = self.getPageContent()
+
             for index in range(len(pageContent)):
                 if 'Keine Verfügbarkeit in dieser Woche' not in pageContent[index][0]:
                     key: int = pageContent[index][1]
-                    self.client.api.account.messages.create(
-                        to=myPhoneNumber, from_=botPhoneNumber, body=f'Termin Verfügbar in {self.pageInfoDict[key]} Link: {self.rootUrl}{key}')
+                    if sendSMS:
+                        self.client.api.account.messages.create(
+                            to=myPhoneNumber,
+                            from_=botPhoneNumber,
+                            body=f'Termin Verfügbar in {self.pageInfoDict[key]} Link: {self.rootUrl}{key}')
+
+                    else:
+                        webbrowser.open(f'{self.rootUrl}{key}')
+
                     self.keepChecking: bool = False
 
         return True
-
-
 
 
 if __name__ == '__main__':
